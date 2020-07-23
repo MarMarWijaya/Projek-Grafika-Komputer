@@ -1524,7 +1524,7 @@ void kabah_tengah(){
 //    glVertex3f(0,-12,1.9);
     glEnd();
     glBegin(GL_QUADS);
-    glColor3f(0,0,0);
+    glColor3ub(237, 194, 183);
     glVertex3f(-6,-5.6,8);
     glVertex3f(6,-5.6,8);
     glVertex3f(6,-5.6,2);
@@ -1693,14 +1693,14 @@ void ngon(int n, float cx,float cy, float cz, float radius, float rotAngle){
         glVertex3f(radius*cos(angle)+cx,cy, radius*sin(angle)+cz);
     }
 }
-void ngon2(int n, float cx,float cy, float cz, float radius, float rotAngle){
+void ngon2(int n, float cx,float cy, float cz, float radius, float rotAngle,float x1,float y1, float z1){
     double angle, angleInc;
     int k;
 
     if(n<3) return;
     angle=rotAngle*3.14159265*180;
     angleInc=2*3.14159265/n;
-    glVertex3f(0,-5.7,5);
+    glVertex3f(x1,y1,z1);
     //ini titik pertama
     glVertex3f(radius*cos(angle)+cx,cy, radius*sin(angle)+cz);
 
@@ -1710,7 +1710,7 @@ void ngon2(int n, float cx,float cy, float cz, float radius, float rotAngle){
         glVertex3f(radius*cos(angle)+cx,cy, radius*sin(angle)+cz);
     }
 }
-void ngon3(int n, float cx, float cz, float radius, float rotAngle){
+void ngon3(int n, float cx,float cy1,float cy2, float cz, float radius, float rotAngle){
     double angle, angleInc;
     int k;
 
@@ -1719,13 +1719,13 @@ void ngon3(int n, float cx, float cz, float radius, float rotAngle){
     angleInc=2*3.14159265/n;
 
     //ini titik pertama
-    glVertex3f(radius*cos(angle)+cx,-12, radius*sin(angle)+cz);
-    glVertex3f(radius*cos(angle)+cx,-8, radius*sin(angle)+cz);
+    glVertex3f(radius*cos(angle)+cx,cy1, radius*sin(angle)+cz);
+    glVertex3f(radius*cos(angle)+cx,cy2, radius*sin(angle)+cz);
     //ini titik berikutnya
     for(k=0;k<n;k++){
         angle+=angleInc;
-        glVertex3f(radius*cos(angle)+cx,-8, radius*sin(angle)+cz);
-        glVertex3f(radius*cos(angle)+cx,-12, radius*sin(angle)+cz);
+        glVertex3f(radius*cos(angle)+cx,cy2, radius*sin(angle)+cz);
+        glVertex3f(radius*cos(angle)+cx,cy1, radius*sin(angle)+cz);
     }
 }
 void lingkaran(){
@@ -1738,17 +1738,186 @@ void lingkaran(){
 void kerucut(){
     glBegin(GL_TRIANGLE_FAN);
     glColor3ub(128, 55, 98);
-    ngon2(50,0,-8,5,6,45);
+    ngon2(100,0,-8,5,6,45,0,-5.7,5);
+    glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glColor3f(0.8,0.2,0.2);
+    ngon2(100,0,12,5,4,45,0,15,5);
+    glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glColor3ub(128, 55, 98);
+    ngon2(100,8,-10,14,2,45,8,-9,14);
+    glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glColor3ub(128, 55, 98);
+    ngon2(100,-8,-10,14,2,45,-8,-9,14);
+    glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glColor3ub(128, 55, 98);
+    ngon2(100,-23,-10,14,5,45,-23,-9,14);
+    glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glColor3ub(128, 55, 98);
+    ngon2(100,23,-10,14,5,45,23,-9,14);
     glEnd();
 }
 void selimut_tabung(){
-    glBegin(GL_TRIANGLE_FAN);
+    glBegin(GL_POLYGON);
     glColor3ub(220, 170, 120);
-    ngon3(50,0,5,6,45);
+    ngon3(100,0,-12,-8,5,6,45);
     glEnd();
+    glBegin(GL_POLYGON);
+    glColor3ub(200, 150, 120);
+    ngon3(100,0,12,9,5,4,45);
+    glEnd();
+    glBegin(GL_POLYGON);
+    glColor3ub(220, 170, 120);
+    ngon3(100,-8,-12,-10,14,2,45);
+    glEnd();
+    glBegin(GL_POLYGON);
+    glColor3ub(220, 170, 120);
+    ngon3(100,8,-12,-10,14,2,45);
+    glEnd();
+    glBegin(GL_POLYGON);
+    glColor3ub(220, 170, 120);
+    ngon3(100,23,-12,-10,14,5,45);
+    glEnd();
+    glBegin(GL_POLYGON);
+    glColor3ub(220, 170, 120);
+    ngon3(100,-23,-12,-10,14,5,45);
+    glEnd();
+
+}
+class GLintPoint
+{
+public:
+		GLint x, y;
+};
+
+
+class Point2
+{
+public:
+	float x,y;
+	void set(float dx,float dy)
+	{
+		x = dx;
+		y = dy;
+	}
+	void set(Point2 &p)
+	{
+		x = p.x;
+		y = p.y;
+	}
+	Point2(float xx,float yy)
+	{
+		x = xx;
+		y = yy;
+	}
+	Point2()
+	{
+		x = y = 0;
+	}
+};
+
+
+GLintPoint CP;
+
+
+float lerp (float a, float b, float t)
+{
+	return a + (b - a) *t;
 }
 
 
+Point2 Tween(Point2 A, Point2 B ,float t)
+	{
+		Point2 P;
+		P.x = lerp(A.x,B.x,t);
+		P.y = lerp(A.y,B.y,t);
+		return P;
+	}
+
+
+void moveTo(GLint x ,GLint y)
+{
+	CP.x = x; CP.y = y;
+}
+
+
+void lineTo(GLint x ,GLint y)
+{
+	glBegin (GL_LINES);
+	glVertex3f(CP.x,CP.y,15);
+	glVertex3f(x,y,15);
+	glEnd();
+	//glutSwapBuffers();
+	CP.x = x; CP.y = y;
+}
+
+
+void drawTween (Point2 A[], Point2 B[], int n, float t)
+{
+     for (int i = 0; i < n; i++)
+     {
+        Point2 P;
+        P = Tween (A[i], B[i], t);
+        if (i == 0) moveTo (P.x, P.y);
+        else lineTo (P.x, P.y);
+       }
+}
+void myDisplay(void)
+{
+	//int x;
+	//glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.0,0.0,1.0);
+
+	Point2 A[13];
+		A [0].set(-18,40);
+		A [1].set(-16,41);
+		A [2].set(-15,40);
+		A [3].set(-14,41);
+		A [4].set(-12,40);
+		A [5].set(-14,41);
+        A [6].set(-15,40);
+        A [7].set(-16,40);
+        A [8].set(-14,40);
+        A [9].set(-14,40);
+        A [10].set(-14,40);
+        A [11].set(-14,40);
+        A [12].set(-14,40);
+
+	Point2 B[13];
+		B [0].set(10,43);
+		B [1].set(11,42);
+		B [2].set(12,42);
+		B [3].set(13,41);
+		B [4].set(13,41);
+		B [5].set(14,42);
+		B [6].set(15,42);
+        B [7].set(16,43);
+        B [8].set(15,42);
+        B [9].set(14,42);
+        B [10].set(13,41);
+        B [11].set(12,41);
+        B [12].set(14,41);
+
+
+	glColor3f(1,0,0);
+	drawTween(A,B,13,0.0);
+
+//	glColor3f(0,0,1);
+//	for(x=1;x<=9;x+=1)
+//	{
+//		drawTween(A,B,6,0.1*x);
+//	}
+
+	glColor3f(1,0,0);
+	drawTween(A,B,13,0.991);
+
+	//glFlush();
+	//glutSwapBuffers();
+}
 
 void tampil(void){
 glPushMatrix();
@@ -1987,11 +2156,12 @@ float ax = -30; float ay = 30;
     glVertex2f(px1*(-1),py1);
     glVertex2f(px2*(-1),py2);
     glEnd();
-
+    myDisplay();
     glPopMatrix();
 
 
     glutSwapBuffers();
+    glFlush();
 }
 
 
